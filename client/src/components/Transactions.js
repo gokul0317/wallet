@@ -100,9 +100,9 @@ export default function Transactions() {
   const csvReport = {
     data: data,
     headers: headers,
-    filename: `Transaction_${wallet.id}.csv`
+    filename: `Transaction_${wallet?.id}.csv`
   };
-
+  const isButtonEnable = !wallet?.id;
   return (
     <Stack direction="column" gap="1rem" height="100%" minHeight="500px" justifyContent="center" alignItems="center" margin="1rem"  >
       <Stack direction="row" justifyContent="flex-start" alignItems="center" width="100%" gap="1rem" padding="1rem">
@@ -143,7 +143,7 @@ export default function Transactions() {
         </Table>
       </TableContainer>
       <Stack direction="row" gap="1rem" justifyContent="ceter" alignItems="center">
-        <Button variant='outlined'><CSVLink {...csvReport}>Export to CSV</CSVLink></Button>
+        <Button disabled={isButtonEnable} variant='outlined'><CSVLink {...csvReport}>Export to CSV</CSVLink></Button>
         <TablePagination
           component="div"
           count={count}
