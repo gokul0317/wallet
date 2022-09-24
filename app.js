@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 app.use(express.json());
 
-// Post req.body => name: string, balance: number;
+// Post req.body => name: string, balance: string;
 app.post("/setup", async (req, res) => {
     const { isError, errors } = validateSetup(req.body);
     if (!isError) {
@@ -31,7 +31,7 @@ app.post("/setup", async (req, res) => {
     }
 });
 
-// Post req.body => description: string, amount: number; req.params => walletId : string;
+// Post req.body => description: string, amount: string; req.params => walletId : string;
 app.post("/transaction/:walletId", async (req, res) => {
     const { walletId } = req.params;
     const { isError, errors } = validateTransaction(req.body);
