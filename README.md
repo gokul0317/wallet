@@ -19,4 +19,7 @@
     
 
 # Wallet App
-    The app will look for wallet stored it localstorage, if the item is present transaction screen will be shown else option to add a new wallet will be shown. There is list transaction page where all the transactions related to wallet in localstorage will be displayed. The transaction list has paginated data, option to sort.
+    The app will look for wallet stored it localstorage,
+    if the item is present transaction screen will be shown else option to add a new wallet will be shown.
+    There is list transaction page where all the transactions related to wallet in localstorage will be displayed.
+    The transaction list has paginated data, option to sort.
