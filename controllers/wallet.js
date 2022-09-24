@@ -65,7 +65,7 @@ const gettransactionById = async ({ transactionId }) => {
 }
 
 const getAllTransactions = async ({ walletId, skip, limit, order, sort }) => {
-    const sortValue = order === "desc" ? 1 : -1 
+    const sortValue = order === "desc" ? -1 : 1 
     const allTransactions = await Transaction
         .find({ walletId })
         .skip(skip)
