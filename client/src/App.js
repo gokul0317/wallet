@@ -7,6 +7,7 @@ import {
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import Invalid from "./Invalid";
 
 import AddWallet from "./components/AddWallet";
 import Transactions from "./components/Transactions";
@@ -20,6 +21,7 @@ function App() {
             <Routes>
               <Route exact path='/' element={< AddWallet />}></Route>
               <Route exact path='/list-transactions' element={< Transactions />}></Route>
+              <Route path='*' exact={true} element={<Invalid />} />
             </Routes>
           </Router>
         </Box>

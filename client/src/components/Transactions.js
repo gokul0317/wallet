@@ -17,8 +17,10 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import axios from "axios";
+import { CSVLink } from "react-csv";
 
 export default function Transactions() {
   const { wallet, getItem } = useLocalstorage();
@@ -51,12 +53,21 @@ export default function Transactions() {
     setSort(event.target.value);
   }, []);
 
-  
+
   const handleOrderChange = useCallback((event) => {
     setOrder(event.target.value);
   }, []);
 
-  
+  const headers = [
+    { label: "Transaction Id", key: "_id" },
+    { label: "Wallet Id", key: "walletId" },
+    { label: "Description", key: "description" },
+    { label: "Amount", key: "amount" },
+    { label: "Balance", key: "balance" },
+    { label: "Type", key: "type" },
+    { label: "Date", key: "date" },
+  ];
+
   useEffect(() => {
     const cb = async () => {
       try {
@@ -74,7 +85,7 @@ export default function Transactions() {
       cb();
     }
   }, [getTransactions, limit, skip, wallet?.id, sort, order])
-  
+
 
   useEffect(() => {
     if (!wallet) getItem()
@@ -85,6 +96,13 @@ export default function Transactions() {
       <CircularProgress />
     </Stack>)
   }
+
+  const csvReport = {
+    data: data,
+    headers: headers,
+    filename: `Transaction_${wallet.id}.csv`
+  };
+
   return (
     <Stack direction="column" gap="1rem" height="100%" minHeight="500px" justifyContent="center" alignItems="center" margin="1rem"  >
       <Stack direction="row" justifyContent="flex-start" alignItems="center" width="100%" gap="1rem" padding="1rem">
@@ -97,13 +115,9 @@ export default function Transactions() {
         <Table sx={{ minWidth: 650 }} aria-label="transaction table">
           <TableHead>
             <TableRow >
-              <TableCell>Transaction Id</TableCell>
-              <TableCell>Wallet Id</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Amount</TableCell>
-              <TableCell>Balance</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Date</TableCell>
+              {
+                headers.map(({ label, key }) => (<TableCell key={key}>{label}</TableCell>))
+              }
             </TableRow>
           </TableHead>
           <TableBody>
@@ -129,6 +143,7 @@ export default function Transactions() {
         </Table>
       </TableContainer>
       <Stack direction="row" gap="1rem" justifyContent="ceter" alignItems="center">
+        <Button variant='outlined'><CSVLink {...csvReport}>Export to CSV</CSVLink></Button>
         <TablePagination
           component="div"
           count={count}
