@@ -103,12 +103,20 @@ export default function Transactions() {
     filename: `Transaction_${wallet?.id}.csv`
   };
   const isButtonEnable = !wallet?.id;
+
+  if (!wallet) {
+    return (
+      <Stack display="flex" direction="column" height="100%" justifyContent="center" alignItems="center">
+        <Typography>No Wallet found. Go to <Link to="/">Add a new Wallet</Link></Typography>
+      </Stack>
+    )
+  }
   return (
     <Stack direction="column" gap="1rem" height="100%" minHeight="500px" justifyContent="center" alignItems="center" margin="1rem"  >
       <Stack direction="row" justifyContent="flex-start" alignItems="center" width="100%" gap="1rem" padding="1rem">
         <Link to="/" style={{ display: "flex", alignItems: "center", justifyContent: "center" }} ><ChevronLeftIcon />Back</Link>
         <Typography variant='h6'>
-          Transactions list
+          {wallet.name} 's Transactions list
         </Typography>
       </Stack>
       <TableContainer component={Paper}  >

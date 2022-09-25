@@ -169,7 +169,7 @@ export default function AddWallet() {
 
   const transactoinView = useMemo(() => {
     return (<>
-      <Typography variant='h6' fontSize="14px">Transaction</Typography>
+      {wallet?.name ? <Typography variant='h6' fontSize="14px">Hi {wallet?.name}, Welcome.</Typography> : <>No wallet found.</>}
       <TextField size='small' fullWidth label="Description" value={description} error={!!descriptionError.length} helperText={descriptionError} onChange={(e) => {
         const { value } = e.target
         if (value.trim().length) {
@@ -186,7 +186,6 @@ export default function AddWallet() {
           setAmount(value);
         }} />
         <FormControlLabel
-          // label={isChecked ? TRANSACTION_TYPES.CREDIT : TRANSACTION_TYPES.DEBIT}
           labelPlacement="bottom"
           style={{ gap: ".5rem" }}
           label={<Typography style={{ fontSize: "10px" }}>{isChecked ? TRANSACTION_TYPES.CREDIT : TRANSACTION_TYPES.DEBIT}</Typography>}
@@ -196,7 +195,7 @@ export default function AddWallet() {
       <LoadingButton loading={loading} size='small' variant='outlined' onClick={transaction}>Submit</LoadingButton>
       <Link className="MuiLink-button" to="/list-transactions">Transactions</Link>
     </>)
-  }, [description, amount, transaction, loading, descriptionError, amountError, isChecked])
+  }, [description, amount, transaction, loading, descriptionError, amountError, isChecked, wallet])
 
   return (
     <Stack display="flex" direction="column" height="100%" justifyContent="center" alignItems="center">
