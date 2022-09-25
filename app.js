@@ -16,7 +16,7 @@ app.post("/setup", async (req, res) => {
         try {
             const { name, balance } = req.body
             const savedWallet = await addWallet({ name, balance: Number(balance) });
-            const { isError, data, errors, message } = await addTransaction({ description: "Setup", amount: Number(balance), type: "DEBIT", walletId: savedWallet._id, isNew: true })
+            const { isError, data, errors, message } = await addTransaction({ description: "Setup", amount: Number(balance), type: "CREDIT", walletId: savedWallet._id, isNew: true })
             if (isError) {
                 return res.status(400).send({ errors, message });
             } else {
@@ -38,7 +38,7 @@ app.post("/transaction/:walletId", async (req, res) => {
     if (!isError) {
         try {
             const { description, amount } = req.body;
-            const type = amount >= 0 ? "DEBIT" : "CREDIT";
+            const type = amount >= 0 ? "CREDIT" : "DEBIT";
             const { isError, data, errors, message } = await addTransaction({ description, amount: Number(amount), type, walletId });
             if (isError) {
                 return res.status(400).send({ errors, message });
