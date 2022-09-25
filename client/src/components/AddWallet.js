@@ -4,9 +4,13 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import LoadingButton from "@mui/lab/LoadingButton";
-import guseLocalstorage from "../hooks/useLocalstorage";
+import Switch from '@mui/material/Switch';
+import FormControlLabel from "@mui/material/FormControlLabel";
 import axios from "axios";
+
+import guseLocalstorage from "../hooks/useLocalstorage";
 import useAlert from "../hooks/useAlert"
+import { TRANSACTION_TYPES } from "./constants";
 
 export default function AddWallet() {
   const [name, setName] = useState("");
@@ -20,6 +24,7 @@ export default function AddWallet() {
   const [descriptionError, setdescriptionError] = useState("");
   const [amountError, setAmountError] = useState("");
   const [balanceError, setBalanceError] = useState("");
+  const [isChecked, setIsChecked] = useState(true);
 
   const clearWallet = useCallback(() => {
     setName("");
@@ -29,6 +34,7 @@ export default function AddWallet() {
   const clearTransaction = useCallback(() => {
     setDescription("");
     setAmount("");
+    setIsChecked(true);
   }, [])
 
   const validateWallet = useCallback(() => {
@@ -57,7 +63,7 @@ export default function AddWallet() {
     }
     if (!amount.trim().length) {
       isError = true;
-      setAmountError("amount is required");
+      setAmountError("Amount is required");
     }
 
     if (amount.trim().length && Number(amount) === 0) {
@@ -94,6 +100,15 @@ export default function AddWallet() {
     }
   }, [name, balance, setItem, clearWallet, setAlertMessage, validateWallet]);
 
+  const formatAmount = useCallback(() => {
+    let formattedAmount = amount;
+    if (amount.trim().length) {
+      formattedAmount = Number(amount);
+      formattedAmount = isChecked ? Math.abs(formattedAmount) : -Math.abs(formattedAmount)
+    }
+    return formattedAmount
+  }, [isChecked, amount])
+
   const transaction = useCallback(async () => {
     const isTransactionInvalid = validateTransaction();
     if (isTransactionInvalid) return;
@@ -108,7 +123,7 @@ export default function AddWallet() {
             'Accept': 'application/json',
           },
           data: {
-            description, amount: amount.trim().length ? Number(amount) : amount
+            description, amount: formatAmount()
           }
         };
         await axios(options);
@@ -123,7 +138,7 @@ export default function AddWallet() {
     } else {
       console.log("Skipping no wallet found")
     }
-  }, [wallet, description, amount, clearTransaction, setAlertMessage, validateTransaction]);
+  }, [wallet, description, formatAmount, clearTransaction, setAlertMessage, validateTransaction]);
 
   useEffect(() => {
     getItem();
@@ -155,24 +170,33 @@ export default function AddWallet() {
   const transactoinView = useMemo(() => {
     return (<>
       <Typography variant='h6' fontSize="14px">Transaction</Typography>
-      <TextField size='small' label="Description" value={description} error={!!descriptionError.length} helperText={descriptionError} onChange={(e) => {
+      <TextField size='small' fullWidth label="Description" value={description} error={!!descriptionError.length} helperText={descriptionError} onChange={(e) => {
         const { value } = e.target
         if (value.trim().length) {
           setdescriptionError("");
         }
         setDescription(value);
       }} />
-      <TextField size='small' label="Amount" type="number" error={!!amountError.length} value={amount} helperText={amountError} onChange={(e) => {
-        const { value } = e.target
-        if (value.trim().length) {
-          setAmountError("");
-        }
-        setAmount(value);
-      }} />
+      <Stack direction="row" justifyContent="center" alignItems="center" gap=".5rem">
+        <TextField size='small' label="Amount" type="number" error={!!amountError.length} value={amount} helperText={amountError} onChange={(e) => {
+          const { value } = e.target
+          if (value.trim().length) {
+            setAmountError("");
+          }
+          setAmount(value);
+        }} />
+        <FormControlLabel
+          // label={isChecked ? TRANSACTION_TYPES.CREDIT : TRANSACTION_TYPES.DEBIT}
+          labelPlacement="bottom"
+          style={{ gap: ".5rem" }}
+          label={<Typography style={{ fontSize: "10px" }}>{isChecked ? TRANSACTION_TYPES.CREDIT : TRANSACTION_TYPES.DEBIT}</Typography>}
+          control={<Switch size='small' checked={isChecked} onChange={() => setIsChecked(!isChecked)} />}
+        />
+      </Stack>
       <LoadingButton loading={loading} size='small' variant='outlined' onClick={transaction}>Submit</LoadingButton>
       <Link className="MuiLink-button" to="/list-transactions">Transactions</Link>
     </>)
-  }, [description, amount, transaction, loading, descriptionError, amountError])
+  }, [description, amount, transaction, loading, descriptionError, amountError, isChecked])
 
   return (
     <Stack display="flex" direction="column" height="100%" justifyContent="center" alignItems="center">
