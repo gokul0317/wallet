@@ -7,15 +7,18 @@ const validateSetup = (body) => {
         isError = true;
         errors.push("name is required");
     }
+
+    if (isNaN(body.balance) || typeof body.balance === "string" ) {
+        isError = true;
+        errors.push("balance should be a number");
+    }
+
     if (body.balance === undefined || body.balance === null) {
         isError = true;
         errors.push("balance is required");
     }
-    if (isNaN(Number(body.balance))) {
-        isError = true;
-        errors.push("balance should be a number");
-    }
-    if (body.balance < 0) {
+
+    if (Number(body.balance < 0)) {
         isError = true;
         errors.push("balance should be greater than 0");
     }
@@ -29,14 +32,22 @@ const validateTransaction = (body) => {
         isError = true;
         errors.push("description is required");
     }
-    if (body.amount === undefined || body.amount === null || !body.amount.trim().length) {
-        isError = true;
-        errors.push("amount is required");
-    }
-    if (isNaN(Number(body.amount))) {
+
+    if (isNaN(body.amount) || typeof body.amount === "string") {
         isError = true;
         errors.push("amount should be a number");
     }
+
+    if (body.amount === undefined || body.amount === null) {
+        isError = true;
+        errors.push("amount is required");
+    }
+
+    if (Number(body.amount === 0)) {
+        isError = true;
+        errors.push("amount cannot be 0");
+    }
+    
     return { isError, errors };
 }
 

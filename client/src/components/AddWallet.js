@@ -37,7 +37,7 @@ export default function AddWallet() {
           'Accept': 'application/json',
         },
         data: {
-          name, balance: balance
+          name, balance: balance.trim().length ? Number(balance) : balance
         }
       };
       const resp = await axios(options);
@@ -64,7 +64,7 @@ export default function AddWallet() {
             'Accept': 'application/json',
           },
           data: {
-            description, amount
+            description, amount: amount.trim().length ? Number(amount) : amount
           }
         };
         await axios(options);
@@ -88,9 +88,9 @@ export default function AddWallet() {
       <>
         <Typography variant='h6' fontSize="14px">Add Wallet</Typography>
         <TextField size='small' label="User name" value={name} onChange={(e) => setName(e.target.value)} />
-        <TextField size='small' label="Balance" value={balance} onChange={(e) => {
+        <TextField size='small' label="Balance" type="number" value={balance} onChange={(e) => {
           const { value } = e.target
-          setBalance(value)
+          setBalance(value);
         }} />
         <LoadingButton loading={loading} size='small' variant='outlined' onClick={createWallet}>Submit</LoadingButton>
       </>
@@ -101,9 +101,9 @@ export default function AddWallet() {
     return (<>
       <Typography variant='h6' fontSize="14px">Transaction</Typography>
       <TextField size='small' label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-      <TextField size='small' label="Amount" value={amount} onChange={(e) => {
+      <TextField size='small' label="Amount" type="number" value={amount} onChange={(e) => {
         const { value } = e.target
-        setAmount(value)
+        setAmount(value);
       }} />
       <LoadingButton loading={loading} size='small' variant='outlined' onClick={transaction}>Submit</LoadingButton>
       <Link className="MuiLink-button" to="/list-transactions">Transactions</Link>
