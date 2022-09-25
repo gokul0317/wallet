@@ -1,4 +1,4 @@
-let objectID = require('mongoose').Types.ObjectId;
+const objectID = require('mongoose').Types.ObjectId;
 
 const validateSetup = (body) => {
     let isError = false;
