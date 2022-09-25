@@ -16,6 +16,10 @@ export default function AddWallet() {
   const [loading, setLoading] = useState(false);
   const { getItem, isExist, setItem, wallet } = guseLocalstorage();
   const { alertMessage, setAlertMessage } = useAlert();
+  const [nameError, setNameError] = useState("");
+  const [descriptionError, setdescriptionError] = useState("");
+  const [amountError, setAmountError] = useState("");
+  const [balanceError, setBalanceError] = useState("");
 
   const clearWallet = useCallback(() => {
     setName("");
@@ -27,7 +31,45 @@ export default function AddWallet() {
     setAmount("");
   }, [])
 
+  const validateWallet = useCallback(() => {
+    let isError = false;
+    if (!name.trim().length) {
+      isError = true;
+      setNameError("Name is required");
+    }
+    if (!balance.trim().length) {
+      isError = true;
+      setBalanceError("Balance is required");
+    }
+
+    if (balance.trim().length && Number(balance) < 0) {
+      isError = true;
+      setBalanceError("Balance should be greater than 0");
+    }
+    return isError;
+  }, [name, balance])
+
+  const validateTransaction = useCallback(() => {
+    let isError = false;
+    if (!description.trim().length) {
+      isError = true;
+      setdescriptionError("Description is required");
+    }
+    if (!amount.trim().length) {
+      isError = true;
+      setAmountError("amount is required");
+    }
+
+    if (amount.trim().length && Number(amount) === 0) {
+      isError = true;
+      setAmountError("Amount cannot be 0");
+    }
+    return isError;
+  }, [description, amount])
+
   const createWallet = useCallback(async () => {
+    const isWalletInvalid = validateWallet();
+    if (isWalletInvalid) return;
     try {
       setLoading(true);
       const options = {
@@ -50,13 +92,15 @@ export default function AddWallet() {
     } finally {
       setLoading(false);
     }
-  }, [name, balance, setItem, clearWallet, setAlertMessage]);
+  }, [name, balance, setItem, clearWallet, setAlertMessage, validateWallet]);
 
   const transaction = useCallback(async () => {
-    setLoading(true);
+    const isTransactionInvalid = validateTransaction();
+    if (isTransactionInvalid) return;
     const { id } = wallet
     if (id) {
       try {
+        setLoading(true);
         const options = {
           url: `/transaction/${id}`,
           method: 'POST',
@@ -76,8 +120,10 @@ export default function AddWallet() {
       } finally {
         setLoading(false);
       }
+    } else {
+      console.log("Skipping no wallet found")
     }
-  }, [wallet, description, amount, clearTransaction, setAlertMessage]);
+  }, [wallet, description, amount, clearTransaction, setAlertMessage, validateTransaction]);
 
   useEffect(() => {
     getItem();
@@ -87,28 +133,46 @@ export default function AddWallet() {
     return (
       <>
         <Typography variant='h6' fontSize="14px">Add Wallet</Typography>
-        <TextField size='small' label="User name" value={name} onChange={(e) => setName(e.target.value)} />
-        <TextField size='small' label="Balance" type="number" value={balance} onChange={(e) => {
+        <TextField size='small' label="User name" error={!!nameError.length} value={name} helperText={nameError} onChange={(e) => {
           const { value } = e.target
+          if (value.trim().length) {
+            setNameError("")
+          }
+          setName(value)
+        }} />
+        <TextField size='small' label="Balance" type="number" error={!!balanceError.length} value={balance} helperText={balanceError} onChange={(e) => {
+          const { value } = e.target;
+          if (value.trim().length) {
+            setBalanceError("")
+          }
           setBalance(value);
         }} />
         <LoadingButton loading={loading} size='small' variant='outlined' onClick={createWallet}>Submit</LoadingButton>
       </>
     )
-  }, [name, balance, createWallet, loading]);
+  }, [name, balance, createWallet, loading, nameError, balanceError]);
 
   const transactoinView = useMemo(() => {
     return (<>
       <Typography variant='h6' fontSize="14px">Transaction</Typography>
-      <TextField size='small' label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-      <TextField size='small' label="Amount" type="number" value={amount} onChange={(e) => {
+      <TextField size='small' label="Description" value={description} error={!!descriptionError.length} helperText={descriptionError} onChange={(e) => {
         const { value } = e.target
+        if (value.trim().length) {
+          setdescriptionError("");
+        }
+        setDescription(value);
+      }} />
+      <TextField size='small' label="Amount" type="number" error={!!amountError.length} value={amount} helperText={amountError} onChange={(e) => {
+        const { value } = e.target
+        if (value.trim().length) {
+          setAmountError("");
+        }
         setAmount(value);
       }} />
       <LoadingButton loading={loading} size='small' variant='outlined' onClick={transaction}>Submit</LoadingButton>
       <Link className="MuiLink-button" to="/list-transactions">Transactions</Link>
     </>)
-  }, [description, amount, transaction, loading])
+  }, [description, amount, transaction, loading, descriptionError, amountError])
 
   return (
     <Stack display="flex" direction="column" height="100%" justifyContent="center" alignItems="center">
